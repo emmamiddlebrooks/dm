@@ -27,7 +27,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		handlePost(rw, req, h.client)
 		return
 	} else {
-		http.Error(rw, "Invalid method", http.StatusMethodNotAllowed)
+		http.Error(rw, "invalid method", http.StatusMethodNotAllowed)
 		return
 	}
 }
