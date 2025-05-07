@@ -1,0 +1,389 @@
+:root {
+    --platinum: #D9D9D9;
+    --red: #FF1616;
+    --dark-black: #060606;
+    --gray: #1f1f1f;
+    --georgia-red: #BA0C2F;
+}
+
+.platinum {
+    background-color: var(--platinum);
+    color: var(--dark-black);
+}
+
+.red {
+    background-color: var(--red);
+}
+
+.dark-black {
+    background-color: var(--dark-black);
+}
+
+.gray {
+    background-color: var(--gray);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+::-moz-selection { /* Code for Firefox */
+    color: var(--platinum);
+    background: var(--red);
+}
+
+::selection {
+    color: var(--platinum);
+    background: var(--red);
+}
+
+body {
+    background-color: var(--dark-black);
+    margin: 0;
+    min-width:1000px;
+    width: auto !important;
+    width:1000px;
+}
+
+h1 {
+    color: var(--platinum);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    letter-spacing: 2px;
+    padding: 0 0 10px 0;
+    margin: 0;
+}
+
+h2 {
+    color: var(--red);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    padding: 0 0 5px 0;
+    margin: 0;
+}
+
+h3 {
+    color: var(--platinum);
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+}
+
+li {
+    color: var(--platinum);
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+}
+
+p {
+    color: var(--platinum);
+}
+
+.header {
+    max-width: 100%;
+    height: 140px;
+    position: relative;
+}
+
+.header-text {
+    color: var(--red);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 36px;
+}
+
+.header-img {
+    max-width: 80%;
+    height: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.worship {
+     display: block;
+ }
+
+.worship-img {
+    width: 100%;
+    max-height: 950px;
+}
+
+.worship-text {
+    max-width: 50%;
+    position: absolute;
+    top: 35%;
+    left: 48%;
+    transform: translate(-50%, -50%);
+    color: var(--platinum);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 3.3vw;
+    line-height: 1;
+    letter-spacing: 2px;
+}
+
+.worship-phone {
+    display: none;
+}
+
+.worship-img-phone {
+    display: none;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 200px;
+}
+
+.row img {
+    flex: 1.5;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.info p,
+.our-why p {
+    font-size: 22px;
+}
+
+.what-we-do {
+    padding-left: 5%;
+    background-color: #030303;
+}
+
+.where {
+    padding-left: 5%;
+}
+
+.logos {
+    width: 100%;
+    height: 200px;
+    background-color: dimgrey;
+    text-align: center;
+}
+
+img.logo {
+    padding: 10px 20px 0;
+    height: 130px;
+}
+
+.black-and-white {
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+}
+
+.why {
+    width: 100%;
+    padding: 50px 0;
+    background-color: dimgrey;
+}
+
+.our-why {
+    width: 60%;
+    margin: 0 auto;
+}
+
+.map {
+    width: 70%;
+    margin: 0 auto;
+    padding: 50px 0;
+}
+
+.footer {
+    max-width: 75%;
+    width: 75%;
+    height: 230px;
+    position: relative;
+    left: 25%;
+}
+
+.contact-header {
+    color: var(--platinum);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1;
+}
+
+.contact-info {
+    color: var(--platinum);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.social-media {
+    height: 70px;
+}
+
+.imgContainer{
+    float:left;
+}
+
+.social-media-img {
+    height: 50px;
+    width: 50px;
+}
+
+.copyright-text {
+    font-family: 'Lato', sans-serif;
+    font-size: 20px;
+    color: gray;
+    font-weight: 300;
+}
+
+.copyright {
+    max-width: 100%;
+    height: 30px;
+}
+
+/* Responsive layout - makes a two column-layout instead of four columns */
+@media screen and (max-width: 1080px) {
+    .worship {
+        display: none;
+    }
+
+    .worship-img {
+        display: none;
+    }
+
+    .worship-text {
+        display: none;
+    }
+
+    .worship-phone {
+        display: block;
+    }
+
+    .worship-img-phone {
+        display: block;
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 68px;
+    }
+
+    h2 {
+        font-size: 52px;
+    }
+
+    h3 {
+        font-size: 46px;
+    }
+
+    .info p,
+    .our-why p,
+    li {
+        font-size: 42px;
+    }
+
+    .row {
+        flex-direction: column;
+    }
+
+    .what-we-do {
+        order: 1;
+        width: 70%;
+        margin: 0 auto;
+        padding: 80px 0;
+    }
+
+    .video-wall {
+        order: 2;
+    }
+
+    .where {
+        padding: 100px 0 10px;
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .map {
+        width: 90%;
+    }
+
+    .our-why {
+        width: 85%;
+    }
+
+    img.logo {
+        padding: 10px 20px 0;
+        height: 90px;
+    }
+
+    .footer {
+        height: auto;
+        width: 90%;
+        left: 10%;
+    }
+
+    .contact-header {
+        font-size: 64px;
+    }
+
+    .contact-info {
+        font-size: 48px;
+    }
+
+    .social-media {
+        height: 100px;
+    }
+
+    .social-media-img {
+        height: 100px;
+        width: 100px;
+        margin-right: 20px;
+    }
+
+    .copyright-text {
+        font-size: 38px;
+    }
+}
+
+.scroller {
+    --scrollbar-color-thumb: var(--platinum);
+    --scrollbar-color-track: black;
+    --scrollbar-width: thin;
+    --scrollbar-width-legacy: 10px;
+}
+
+/* Modern browsers with `scrollbar-*` support */
+@supports (scrollbar-width: auto) {
+    .scroller {
+        scrollbar-color: var(--scrollbar-color-thumb) var(--scrollbar-color-track);
+        scrollbar-width: var(--scrollbar-width);
+    }
+}
+
+/* Legacy browsers with `::-webkit-scrollbar-*` support */
+@supports selector(::-webkit-scrollbar) {
+    .scroller::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-color-thumb);
+    }
+    .scroller::-webkit-scrollbar-track {
+        background: var(--scrollbar-color-track);
+    }
+    .scroller::-webkit-scrollbar {
+        max-width: var(--scrollbar-width-legacy);
+        max-height: var(--scrollbar-width-legacy);
+    }
+}
