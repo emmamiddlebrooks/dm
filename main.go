@@ -1,86 +1,42 @@
+//go:build !test
+
 package main
 
 import (
 	"context"
-	"crypto/tls"
+	"gfi/db"
 	"gfi/guest"
-	"gfi/internal"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
+	"gfi/security"
+	"gfi/server"
 	"log/slog"
 	"net/http"
 	"os"
-	"path/filepath"
-	"strings"
 )
-
-func defaultFileServer(w http.ResponseWriter, r *http.Request) {
-	host := r.Host
-	subdir := internal.GetSubdir(host)
-	root := http.Dir("./static/" + subdir)
-
-	path := filepath.Join("static", subdir, r.URL.Path)
-	fi, err := os.Stat(path)
-
-	if err != nil || fi.IsDir() {
-		if r.URL.Path == "/" {
-			http.ServeFile(w, r, filepath.Join("static", subdir, "index.html"))
-		} else {
-			http.Redirect(w, r, "/", http.StatusFound)
-		}
-		return
-	}
-
-	http.FileServer(root).ServeHTTP(w, r)
-}
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	// connect to db
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := db.ConnectToMongo(context.Background(), "mongodb://localhost:27017")
 	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		logger.Error(err.Error())
+		logger.Error("mongo connection failed", slog.String("error", err.Error()))
 		return
 	}
 	logger.Info("Successfully connected to MongoDB")
 
-	http.HandleFunc("/", defaultFileServer)
-	guestHandler := guest.NewGuestHandler(context.Background(), logger, client)
-	http.Handle("/submit", guestHandler)
+	http.HandleFunc("/", server.DefaultFileServer)
+	http.Handle("/submit", guest.NewGuestHandler(context.Background(), logger, client))
 
 	// HTTP
-	go http.ListenAndServe(":80", http.HandlerFunc(internal.Redirect))
+	server.StartHTTPRedirectServer()
 
 	// HTTPS
-	certMap := map[string]tls.Certificate{}
-	load := func(domain, path string) {
-		cert, err := tls.LoadX509KeyPair(path+"/fullchain.pem", path+"/privkey.pem")
-		if err != nil {
-			log.Fatalf("Failed to load cert for %s: %v", domain, err)
-		}
-		certMap[domain] = cert
+	certs, err := security.LoadCertificates(map[string]string{
+		"dynamicmultimediaga.com":          "/etc/letsencrypt/live/dynamicmultimediaga.com",
+		"wildleap.dynamicmultimediaga.com": "/etc/letsencrypt/live/wildleap.dynamicmultimediaga.com",
+	})
+	if err != nil {
+		logger.Error("Certificate loading failed", slog.String("error", err.Error()))
+		return
 	}
-	load("dynamicmultimediaga.com", "/etc/letsencrypt/live/dynamicmultimediaga.com")
-	load("wildleap.dynamicmultimediaga.com", "/etc/letsencrypt/live/wildleap.dynamicmultimediaga.com")
-	tlsConfig := &tls.Config{
-		GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			name := strings.ToLower(hello.ServerName)
-			if cert, ok := certMap[name]; ok {
-				return &cert, nil
-			}
-			return nil, nil
-		},
-	}
-	server := &http.Server{
-		Addr:      ":443",
-		TLSConfig: tlsConfig,
-		Handler:   nil,
-	}
-	log.Fatal(server.ListenAndServeTLS("", ""))
+	server.StartHTTPSServer(certs)
 }
