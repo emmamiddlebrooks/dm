@@ -52,11 +52,10 @@ jobs:
           go install github.com/boumenot/gocover-cobertura@latest
           gocover-cobertura < coverage.out > coverage.xml
 
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: coverage-report
-          path: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   static-check:
     runs-on: ubuntu-latest
