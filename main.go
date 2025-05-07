@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"gfi/guest"
+	"gfi/internal"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -14,10 +15,24 @@ import (
 	"strings"
 )
 
-func redirect(w http.ResponseWriter, req *http.Request) {
-	http.Redirect(w, req,
-		"https://"+req.Host+req.URL.String(),
-		http.StatusMovedPermanently)
+func defaultFileServer(w http.ResponseWriter, r *http.Request) {
+	host := r.Host
+	subdir := internal.GetSubdir(host)
+	root := http.Dir("./static/" + subdir)
+
+	path := filepath.Join("static", subdir, r.URL.Path)
+	fi, err := os.Stat(path)
+
+	if err != nil || fi.IsDir() {
+		if r.URL.Path == "/" {
+			http.ServeFile(w, r, filepath.Join("static", subdir, "index.html"))
+		} else {
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
+		return
+	}
+
+	http.FileServer(root).ServeHTTP(w, r)
 }
 
 func main() {
@@ -28,40 +43,19 @@ func main() {
 		logger.Error(err.Error())
 		return
 	}
-
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		logger.Error(err.Error())
 		return
 	}
-
 	logger.Info("Successfully connected to MongoDB")
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		host := r.Host
-		subdir := getSubdir(host)
-		root := http.Dir("./static/" + subdir)
-
-		path := filepath.Join("static", subdir, r.URL.Path)
-		fi, err := os.Stat(path)
-
-		if err != nil || fi.IsDir() {
-			if r.URL.Path == "/" {
-				http.ServeFile(w, r, filepath.Join("static", subdir, "index.html"))
-			} else {
-				http.Redirect(w, r, "/", http.StatusFound)
-			}
-			return
-		}
-
-		http.FileServer(root).ServeHTTP(w, r)
-	})
-
+	http.HandleFunc("/", defaultFileServer)
 	guestHandler := guest.NewGuestHandler(context.Background(), logger, client)
 	http.Handle("/submit", guestHandler)
 
 	// HTTP
-	go http.ListenAndServe(":80", http.HandlerFunc(redirect))
+	go http.ListenAndServe(":80", http.HandlerFunc(internal.Redirect))
 
 	// HTTPS
 	certMap := map[string]tls.Certificate{}
@@ -89,11 +83,4 @@ func main() {
 		Handler:   nil,
 	}
 	log.Fatal(server.ListenAndServeTLS("", ""))
-}
-
-func getSubdir(host string) string {
-	if strings.HasPrefix(host, "wildleap.") {
-		return "wildleap"
-	}
-	return "main"
 }
