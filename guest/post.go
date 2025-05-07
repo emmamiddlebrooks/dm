@@ -10,10 +10,14 @@ func handlePost(rw http.ResponseWriter, req *http.Request, client *mongo.Client)
 	var guest Guest
 	err := json.NewDecoder(req.Body).Decode(&guest)
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		http.Error(rw, "unable to decode json", http.StatusBadRequest)
 		return
 	}
 
-	insertGuestData(guest, client)
+	err = insertGuestData(guest, client)
+	if err != nil {
+		http.Error(rw, "unable to save guest info", http.StatusInternalServerError)
+		return
+	}
 	rw.WriteHeader(http.StatusCreated)
 }

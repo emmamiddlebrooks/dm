@@ -2,18 +2,16 @@ package guest
 
 import (
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 )
 
-func insertGuestData(guest Guest, client *mongo.Client) {
+func insertGuestData(guest Guest, client *mongo.Client) error {
 	collection := client.Database("wildleap").Collection("guests")
-
 	_, err := collection.InsertOne(context.Background(), guest)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return err
 	}
-
-	fmt.Println("Guest data saved successfully")
+	return nil
 }
