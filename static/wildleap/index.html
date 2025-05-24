@@ -38,7 +38,7 @@
                     <input type="checkbox" class="form-check-input" id="tosCheck" required>
                     <label class="form-check-label" for="tosCheck">I agree to the Terms of Service</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Connect to WiFi</button>
+                <button type="submit" class="btn btn-primary w-100" id="submitButton">Connect to WiFi</button>
             </form>
         </div>
     </div>
@@ -50,6 +50,7 @@
         document.getElementById("guestForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
+            document.getElementById("submitButton").disabled = true;
             document.getElementById("passwordError").style.display = "none";
 
             const firstName = document.getElementById("firstName").value;
@@ -80,6 +81,7 @@
                 } else {
                     if (data.hasOwnProperty('detail') && data['detail'] === "invalid password") {
                         document.getElementById("passwordError").style.display = "block";
+                        document.getElementById("submitButton").disabled = false;
                     }
                 }
             } catch (error) {
