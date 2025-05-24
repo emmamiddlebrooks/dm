@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"gfi/db"
 	"gfi/guest"
 	"gfi/security"
 	"gfi/server"
@@ -15,16 +14,9 @@ import (
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	// connect to db
-	client, err := db.ConnectToMongo(context.Background(), "mongodb://localhost:27017")
-	if err != nil {
-		logger.Error("mongo connection failed", slog.String("error", err.Error()))
-		return
-	}
-	logger.Info("Successfully connected to MongoDB")
 
 	http.HandleFunc("/", server.DefaultFileServer)
-	http.Handle("/submit", guest.NewGuestHandler(context.Background(), logger, client))
+	http.Handle("/submit", guest.NewGuestHandler(context.Background(), logger))
 
 	// HTTP
 	server.StartHTTPRedirectServer()

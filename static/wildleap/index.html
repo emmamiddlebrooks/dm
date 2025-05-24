@@ -4,63 +4,60 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
         <title>Wild Leap Guest WiFi</title>
-        <link rel="stylesheet" href="wildleap.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <link href="css/wildleap.css?v=2" rel="stylesheet">
+        <link href="css/bootstrap.min.css?v=2" rel="stylesheet">
+        <script src="js/bootstrap.bundle.min.js?v=2"></script>
     </head>
     <body>
     <div class="bg"></div>
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center position-relative z-1">
         <!-- Main Form Card -->
-        <div class="card bg-dark bg-opacity-75 text-white mb-custom p-4 rounded-4">
-            <div class="text-center mb-custom">
-                <img src="https://github.com/emmamiddlebrooks/dm/blob/main/static/wildleap/images/WL_Atlanta%20Logo_Beer%20-%20Buffalo%20+%20Text%20-%20White.PNG.png?raw=true" alt="Wild Leap Logo" class="img-fluid">
+        <div class="card bg-dark bg-opacity-75 text-white mb-3 p-4 rounded-4">
+            <div class="text-center mb-3">
+                <img src="images/logo_white.png" alt="Wild Leap Logo" class="img-fluid">
             </div>
             <form id="guestForm">
-                <div class="mb-custom">
+                <div class="mb-3">
                     <label for="firstName" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="firstName" required>
                 </div>
-                <div class="mb-custom">
+                <div class="mb-3">
                     <label for="lastName" class="form-label">Last Name</label>
                     <input type="text" class="form-control" id="lastName" required>
                 </div>
-                <div class="mb-custom">
-                    <label for="email" class="form-label">Email address</label>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
                     <input type="email" class="form-control" id="email" required>
                 </div>
-                <div class="mb-custom form-check">
+                <div class="mb-3">
+                    <label for="wifiPassword" class="form-label">Wi-Fi Password</label>
+                    <input type="password" class="form-control" id="wifiPassword" required>
+                    <div id="passwordError" class="text-danger mt-1" style="display: none;">Invalid password</div>
+                </div>
+                <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="tosCheck" required>
                     <label class="form-check-label" for="tosCheck">I agree to the Terms of Service</label>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Connect to WiFi</button>
             </form>
         </div>
-
-        <!-- Password Bypass Card -->
-        <div class="card bg-dark bg-opacity-75 text-white p-4 rounded-4">
-            <form id="bypassForm">
-                <div class="mb-custom">
-                    <label for="wifiPassword" class="form-label">Enter WiFi Password</label>
-                    <input type="password" class="form-control" id="wifiPassword" required>
-                </div>
-                <button type="submit" class="btn btn-secondary w-100">Connect via Password</button>
-            </form>
-        </div>
     </div>
 
     <script>
-        const unifiLoginUrl = "http://localhost:8880/login"; // Replace with actual
+        const query = new URLSearchParams(window.location.search);
+        const id = query.get('id');
 
         document.getElementById("guestForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
+            document.getElementById("passwordError").style.display = "none";
+
             const firstName = document.getElementById("firstName").value;
             const lastName = document.getElementById("lastName").value;
             const email = document.getElementById("email").value;
+            const password = document.getElementById("wifiPassword").value;
 
             try {
-                // Send to Go backend
                 const response = await fetch("/submit", {
                     method: "POST",
                     headers: {
@@ -69,47 +66,26 @@
                     body: JSON.stringify({
                         first_name: firstName,
                         last_name: lastName,
-                        email: email
+                        email: email,
+                        wifi_password: password,
+                        id: id,
                     })
                 });
-
-                if (!response.ok) throw new Error("Submission failed");
-
-                // On success, submit to UniFi
-                const form = document.createElement("form");
-                form.method = "POST";
-                form.action = unifiLoginUrl;
-
-                form.innerHTML = `
-                    <input type="hidden" name="username" value="${email}">
-                    <input type="hidden" name="redir" value="http://wildleap.com">
-                `;
-
-                document.body.appendChild(form);
-                form.submit();
-
+                const data = await response.json();
+                if (response.ok) {
+                    if (data.hasOwnProperty('redirect_url')) {
+                        console.log("redirecting...")
+                        window.location.href = data['redirect_url'];
+                    }
+                } else {
+                    if (data.hasOwnProperty('detail') && data['detail'] === "invalid password") {
+                        document.getElementById("passwordError").style.display = "block";
+                    }
+                }
             } catch (error) {
                 alert("There was an error submitting your data.");
                 console.error(error);
             }
-        });
-
-        document.getElementById("bypassForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const password = document.getElementById("wifiPassword").value;
-
-            const form = document.createElement("form");
-            form.method = "POST";
-            form.action = unifiLoginUrl;
-
-            form.innerHTML = `
-                <input type="hidden" name="password" value="${password}">
-                <input type="hidden" name="redir" value="http://wildleap.com">
-            `;
-
-            document.body.appendChild(form);
-            form.submit();
         });
     </script>
     </body>
