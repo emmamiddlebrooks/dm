@@ -45,5 +45,16 @@ func DefaultFileServer(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	http.FileServer(root).ServeHTTP(rw, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		setNoCacheHeaders(w)
+		http.FileServer(root).ServeHTTP(w, r)
+	})
+	handler.ServeHTTP(rw, req)
+}
+
+func setNoCacheHeaders(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Surrogate-Control", "no-store")
 }
