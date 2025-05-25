@@ -11,7 +11,6 @@ body, html {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: brightness(40%);
     z-index: 0;
     pointer-events: none;
 }
@@ -31,21 +30,52 @@ body, html {
 }
 
 .card {
-    padding: 20px;
+    padding: 64px;
     width: 100%;
-    max-width: 400px;
+    max-width: 478px;
+    font-size: 14px;
+}
+
+.card input {
+    background: transparent;
+    border-color: #23232659;
+    color: #232326;
+}
+
+.card input:focus {
+    background: transparent;
+    border-color: #23232659;
+    box-shadow: 0 0 0 .25rem #D0150F59;
+}
+
+.card button {
+    background-color: #D0150F;
+    color: white;
+    font-size: 14px;
+}
+
+.card button:hover {
+    background-color: #6e0704;
+    color: white;
 }
 
 .card img {
-    max-height: 100px;
+    max-height: 150px;
 }
 
-@media (max-height: 700px) {
+/*@media (min-width: 810px) and (max-width: 1000px) {*/
+/*    .card {*/
+/*        max-width: 70%;*/
+/*    }*/
+/*}*/
+
+@media (max-width: 810px) {
     .container {
         padding: 10px;
     }
 
-    .card {
-        padding: 15px;
-    }
+    /*.card {*/
+    /*    padding: 15px;*/
+    /*    max-width: 90%;*/
+    /*}*/
 }
