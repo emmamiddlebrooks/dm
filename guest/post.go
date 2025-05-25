@@ -18,11 +18,6 @@ func handlePost(rw http.ResponseWriter, req *http.Request) {
 			"unable to decode json", http.StatusBadRequest, rw)
 		return
 	}
-	if guest.WifiPassword != "BuyABeer" {
-		errors.WriteJsonError(http.StatusText(http.StatusBadRequest),
-			"invalid password", http.StatusBadRequest, rw)
-		return
-	}
 	err = insertGuestData(guest)
 	if err != nil {
 		errors.WriteJsonError(http.StatusText(http.StatusInternalServerError),
@@ -30,12 +25,6 @@ func handlePost(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rw.WriteHeader(http.StatusCreated)
-	redirectUrl := "http://10.1.10.165:8880/guest/s/default/authorize?id=" + guest.ClientID
-	err = json.NewEncoder(rw).Encode(map[string]string{"redirect_url": redirectUrl})
-	if err != nil {
-		errors.WriteJsonError(http.StatusText(http.StatusInternalServerError),
-			"unable to send redirect url", http.StatusInternalServerError, rw)
-	}
 }
 
 func insertGuestData(guest Request) error {
